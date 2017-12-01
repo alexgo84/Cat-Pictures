@@ -38,7 +38,7 @@
                             <outlet property="delegate" destination="bjp-wS-aRe" id="QFx-vg-wg1"/>
                         </connections>
                     </collectionView>
-                    <tabBarItem key="tabBarItem" title="Randoms" image="tabbar-icon-cat-filled" selectedImage="tabbar-icon-cat-filled" id="MBZ-bQ-dFE"/>
+                    <tabBarItem key="tabBarItem" title="Randoms" image="tabbar-icon-cat-filled" landscapeImage="tabbar-icon-cat-filled" selectedImage="tabbar-icon-cat-filled" id="MBZ-bQ-dFE"/>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bK3-dh-Vwb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

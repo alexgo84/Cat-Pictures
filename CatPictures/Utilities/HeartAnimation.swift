@@ -26,7 +26,7 @@ struct HeartAnimation {
         heartImageView.center = center
         
         view.addSubview(heartImageView)
-        UIView.animate(withDuration: 0.3, delay: 0.2, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 1.0, delay: 0.5, options: .curveEaseOut, animations: {
             heartImageView.alpha = 0.0
         }, completion: { _ in
             heartImageView.removeFromSuperview()
