@@ -6,6 +6,11 @@ A sample project using thecatapi
 * Offline cachine of images.
 * Double tap to favorite an image.
 
+### Given more time:
+* Write UnitTests.
+* Pinch to change items-per-row gesture.
+* Export picture functionality.
+
 ### Dependencies:
 * `SwiftSoup` to parse HTML reply from thecatapi.
 * `SDWebImage` to assign images from URLs with placeholder and cahce functionality.
