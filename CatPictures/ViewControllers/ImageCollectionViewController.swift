@@ -16,11 +16,11 @@ protocol ImageCollectionViewControllerDelegate: class {
 class ImageCollectionViewController: UICollectionViewController {
     
     private let dataSource = DataSource<CatPicture>()
-    weak public var delegate: ImageCollectionViewControllerDelegate?
-    var favorites: Bool = false
-
-    fileprivate let paddingSize: CGFloat = 20.0
     
+    public var favorites: Bool = false
+    weak public var delegate: ImageCollectionViewControllerDelegate?
+    
+    fileprivate let paddingSize: CGFloat = 20.0
     public var itemsPerRow: CGFloat = 2
     
     // MARK: - <UIViewController>

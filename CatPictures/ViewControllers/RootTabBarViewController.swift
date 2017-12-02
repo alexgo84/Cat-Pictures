@@ -8,46 +8,60 @@
 
 import UIKit
 
-final class RootTabBarViewController: UITabBarController, ImageCollectionViewControllerDelegate {
+final class RootTabBarViewController: UITabBarController {
 
-    let serviceBus = ServiceBus()
+    private let serviceBus = ServiceBus()
+    private let refreshControl = UIRefreshControl()
     
-    let refreshControl = UIRefreshControl()
+    // MARK: - View Controllers References & config
     
-    // MARK: - View Controllers References
+    private lazy var randomCatsCollectionVC: ImageCollectionViewController = {
+        guard let imageCellViewController = viewControllers?[0] as? ImageCollectionViewController  else {
+            fatalError("Expected to get ImageCollectionViewController, instead got \(viewControllers?[0].debugDescription ?? "nil")")
+        }
+        
+        imageCellViewController.favorites = false
+        imageCellViewController.delegate = self
+        imageCellViewController.itemsPerRow = 2
+        return imageCellViewController
+    }()
     
-    var randomCatsCollectionVC: ImageCollectionViewController!
-    var favoriteCatsCollectionVC: ImageCollectionViewController!
+    private lazy var favoriteCatsCollectionVC: ImageCollectionViewController = {
+        guard let imageCellViewController = viewControllers?[1] as? ImageCollectionViewController  else {
+            fatalError("Expected to get ImageCollectionViewController, instead got \(viewControllers?[1].debugDescription ?? "nil")")
+        }
+        
+        imageCellViewController.favorites = true
+        imageCellViewController.delegate = self
+        imageCellViewController.itemsPerRow = 1
+        return imageCellViewController
+    }()
     
-    // MARK: - <UITabBarController>
+    // MARK: - <UIViewController>
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        randomCatsCollectionVC = viewControllers![0] as! ImageCollectionViewController
-        favoriteCatsCollectionVC = viewControllers![1] as! ImageCollectionViewController
-        
-        randomCatsCollectionVC.favorites = false
-        favoriteCatsCollectionVC.favorites = true
-        
-        randomCatsCollectionVC.delegate = self
-        favoriteCatsCollectionVC.delegate = self
-        
-        randomCatsCollectionVC.itemsPerRow = 2
-        favoriteCatsCollectionVC.itemsPerRow = 1
-        
+        configureRefreshControlOnRandomCatsCollection()
         fetchRandomPicturesAsync()
         fetchFavoritePictures()
-        
-        // Add pull to reload controls ONLY to the random pictures collection view.
-        refreshControl.attributedTitle = NSAttributedString(string: "Pull to Reload")
-        refreshControl.addTarget(self, action: #selector(fetchRandomPicturesAsync), for: .valueChanged)
-        randomCatsCollectionVC.collectionView!.addSubview(refreshControl)
     }
 }
 
 private extension RootTabBarViewController {
 
+    func configureRefreshControlOnRandomCatsCollection() {
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to Reload")
+        refreshControl.backgroundColor = UIColor.lightGray.withAlphaComponent(0.7)
+        refreshControl.addTarget(self, action: #selector(reloadPictures), for: .valueChanged)
+        randomCatsCollectionVC.collectionView?.addSubview(refreshControl)
+        randomCatsCollectionVC.collectionView?.alwaysBounceVertical = true
+    }
+    
     @objc
+    func reloadPictures() {
+        fetchRandomPicturesAsync()
+    }
+    
     func fetchRandomPicturesAsync() {
         APIClient().getRandomCatPictures { (pictures, error) in
             
@@ -64,23 +78,19 @@ private extension RootTabBarViewController {
                 return
             }
             
-            if let randomCatsCollectionVC = self.randomCatsCollectionVC {
-                randomCatsCollectionVC.load(catPictures: pictures)
-            }
+            self.randomCatsCollectionVC.load(catPictures: pictures)
         }
     }
     
     func fetchFavoritePictures() {
-        if let favoriteCatsCollectionVC = favoriteCatsCollectionVC {
-            let favoriteCatPictures = serviceBus.favoritesStorage.getFavorites()
-            favoriteCatsCollectionVC.load(catPictures: favoriteCatPictures)
-        }
+        let favoriteCatPictures = serviceBus.favoritesStorage.getFavorites()
+        favoriteCatsCollectionVC.load(catPictures: favoriteCatPictures)
     }
 }
 
 // MARK: -  <ImageCollectionViewControllerDelegate>
 
-extension RootTabBarViewController {
+extension RootTabBarViewController: ImageCollectionViewControllerDelegate {
     
     func toggle(favorite: Bool, catPicture: CatPicture) {
         if favorite {
